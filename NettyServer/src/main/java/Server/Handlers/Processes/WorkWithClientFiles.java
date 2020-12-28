@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class WorkWithClientFiles {
 
-    // Список состояний. В зависимости от того чем занят клиент
+    // Список состояний.
     public enum State {
         AWAIT, TITLE_Length, TITLE, FILE_Length, DOWNLOAD_FILE
     }

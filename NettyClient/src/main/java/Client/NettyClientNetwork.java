@@ -1,11 +1,9 @@
 package Client;
 
 
+import Client.Handlers.ClientHandler;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -16,9 +14,9 @@ import java.util.concurrent.CountDownLatch;
 
 public class NettyClientNetwork {
 
-    private  final String clientStorage_Path = "StorageClient";
-    private final String host = "localhost";
-    private final int port = 9003;
+    private final String clientStorage_Path = "StorageClient";
+    private static  String host = "localhost";
+    private static int port = 9003;
 
     private static NettyClientNetwork ourInstance = new NettyClientNetwork();
 
@@ -26,13 +24,22 @@ public class NettyClientNetwork {
         return ourInstance;
     }
 
+
     private NettyClientNetwork () {
 
     }
 
     private Channel currentChannel;
 
-    public  Channel getCurrentChannel() {
+    public static int getPort() {
+        return port;
+    }
+
+    public static String getHost() {
+        return host;
+    }
+
+    public Channel getCurrentChannel() {
         return currentChannel;
     }
 
@@ -41,23 +48,25 @@ public class NettyClientNetwork {
         try {
             Bootstrap clientBootstrap = new Bootstrap();
             clientBootstrap.group(group)
-            .channel(NioSocketChannel.class)
-            .remoteAddress(new InetSocketAddress(host, port))
-            .handler(new ChannelInitializer<SocketChannel>() {
+                    .channel(NioSocketChannel.class)
+                    .remoteAddress(new InetSocketAddress(host, port))
+                    .handler(new ChannelInitializer<SocketChannel>() {
 
-                protected void initChannel(SocketChannel socketChannel) throws Exception {
-
-                    socketChannel.pipeline();
-                           // здесь будет хэндлер на обработку файлов полученных с сервера
-                    currentChannel = socketChannel;
-                }
-            });
-            ChannelFuture channelFuture = clientBootstrap.connect().sync();
-            System.out.println("---------------------------");
-            System.out.println("-= CONNECTION COMPLETED =-");
-            System.out.println("---------------------------\n");
-            countDownLatch.countDown();
-            channelFuture.channel().closeFuture().sync();
+                        @Override
+                        public void initChannel(SocketChannel socketChannel) throws Exception {
+                            currentChannel = socketChannel;
+                            socketChannel.pipeline()
+                                    .addLast(new ClientHandler(clientStorage_Path)); // хэндлер на обработку сообещений от сервера
+                        }
+                    })
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+        ;
+            ChannelFuture channelFuture = clientBootstrap.connect(host, port).sync();
+                System.out.println("---------------------------");
+                System.out.println("-= CONNECTION COMPLETED =-");
+                System.out.println("---------------------------\n");
+                countDownLatch.countDown();
+                channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

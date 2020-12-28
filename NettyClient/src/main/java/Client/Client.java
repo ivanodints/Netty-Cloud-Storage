@@ -11,6 +11,8 @@ import java.util.concurrent.CountDownLatch;
 
 public class Client {
 
+    private static final String host = NettyClientNetwork.getHost();
+    private static final int port = NettyClientNetwork.getPort();
     public static final String clientStorage_Path = "StorageClient";
 
 
@@ -84,17 +86,23 @@ public class Client {
                             continue;
 
 
-                    } else if (inputCommand.equals(downloadCommand)) {
-                         System.out.println("Select file name");   // код в разработке
+                    } else if (inputCommand.equals(downloadCommand)) { // скачиваем файлы
+
+                            System.out.println("\nPlease write the file name\nFor example 'demo.txt'");   // код в разработке
+
+                            String fileName = reader.readLine();  //в консоль вписываем имя файла
 
 
-                    } else if (inputCommand.equals(commandsList)) {
+
+                    } else if (inputCommand.equals(commandsList)) {  // список комманд
                         System.out.println("-----------Commands-------------");
                         System.out.println(uploadCommand + " - upload file\n" + downloadCommand + " - download file\n"
                             + serverFilesList + " - files list on server storage\n" + commandsList + " - help");
 
-                    } else if (inputCommand.equals(serverFilesList)) {
-                        System.out.println("Files on server"); // в разработке
+
+
+                    } else if (inputCommand.equals(serverFilesList)) {  // список файлов на сервере
+                        SendMsg.send(host,port);
 
                     } else {
                         System.out.println("###########################");

@@ -2,6 +2,8 @@ package Server.Handlers;
 
 
 import Server.Handlers.Processes.WorkWithClientFiles;
+import Server.Handlers.Processes.WorkWithCommands;
+import Server.NettyServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -18,7 +20,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private Status currentStatus;
     private WorkWithClientFiles workWithClientFiles; //работа с файлами
-//    private ServerCommands serverCommands; // работа с коммандами (в разработке)
+    private WorkWithCommands workWithCommands; // работа с коммандами (в разработке)
 
 
 
@@ -26,13 +28,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
         this.currentStatus = Status.AWAIT;  // по умолчанию статус Ожидание
         this.workWithClientFiles = new WorkWithClientFiles(path);
-//        this.serverCommands = serverCommands;
+        this.workWithCommands = new WorkWithCommands(path);
     }
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("-=New Client connection=-");
-    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -46,20 +44,19 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
                 } else if (checkingByte == (byte) signalToCommands) { // если контрольный байт равен * то работаем с коммандами и меняем статус
                     currentStatus = Status.Work_With_Commands;
-//                    serverCommands.prepare();   // в разработке
+                    workWithCommands.prepare();
                 }
             }
             if (currentStatus == Status.Work_With_Files) { // если статус  Work_With_Files начинаем работу с файлами
                 workWithClientFiles.receivingFileFromClient(ctx,buf);
             }
             if (currentStatus == Status.Work_With_Commands) { // если статус  Work_With_Commands начинаем работу с коммандами
-//                    serverCommands.run(); // в разработке
-
+                workWithCommands.run(NettyServer.getHost(), NettyServer.getPort());
             }
         }
-        if (buf.readableBytes() == 0) {
-            buf.release();
-        }
+//        if (buf.readableBytes() == 0) {
+//            buf.release();
+//        }
     }
 
     @Override

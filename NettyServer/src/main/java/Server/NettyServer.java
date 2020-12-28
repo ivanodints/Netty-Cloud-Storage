@@ -11,13 +11,24 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class NettyServer {
 
-    private static final int port = 9003;
+    private final static int port = 9003;
     public static final String serverStorage_Path = "StorageServer";
+    private final static String host = "localhost";
+
+
 
     public static void main(String[] args) throws Exception {
 
         new NettyServer().startServer();
 
+    }
+
+    public static int getPort() {
+        return port;
+    }
+
+    public static String getHost() {
+        return host;
     }
 
 
@@ -30,8 +41,8 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class)  // канал для подключения клиентов
                     .childHandler(new ChannelInitializer<SocketChannel>() { // настройка общения с клиентом
                         @Override
-                        public void initChannel(SocketChannel sChannel) throws Exception{
-                            sChannel.pipeline()                                                   // список хэндлеров (обработчики событий)
+                        public void initChannel(SocketChannel socketChannel) throws Exception{
+                            socketChannel.pipeline()                                                   // список хэндлеров (обработчики событий)
                                     .addLast(new ServerHandler(serverStorage_Path))
 
                         ;}
