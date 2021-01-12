@@ -24,12 +24,10 @@ public class NettyClientNetwork {
         return ourInstance;
     }
 
-
     private NettyClientNetwork () {
-
     }
 
-    private Channel currentChannel;
+    private static Channel currentChannel;
 
     public static int getPort() {
         return port;
@@ -39,7 +37,7 @@ public class NettyClientNetwork {
         return host;
     }
 
-    public Channel getCurrentChannel() {
+    public static Channel getCurrentChannel() {
         return currentChannel;
     }
 

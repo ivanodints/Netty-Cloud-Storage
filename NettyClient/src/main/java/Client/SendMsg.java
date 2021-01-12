@@ -1,7 +1,12 @@
 package Client;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.ChannelHandlerContext;
+
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class SendMsg {
 
@@ -20,4 +25,15 @@ public class SendMsg {
             e.printStackTrace();
         }
     }
+
+    public static void send () {
+
+        String test = "*";
+        byte[] bytes = test.getBytes(StandardCharsets.UTF_8);
+        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer(bytes.length);
+        byteBuf.writeBytes(bytes);
+        NettyClientNetwork.getCurrentChannel().writeAndFlush(byteBuf);
+
+    }
+
 }

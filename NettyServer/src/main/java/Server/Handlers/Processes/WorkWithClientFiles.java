@@ -34,7 +34,7 @@ public class WorkWithClientFiles {
         receivedFileLength = 0L; // счётчик размера файла выставляем равный
     }
 
-    public void receivingFileFromClient(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+    public void receivingFileFromClient(ByteBuf buf) throws Exception {
 
         while (true) {
             if (currentState == State.TITLE_Length) {
@@ -51,8 +51,6 @@ public class WorkWithClientFiles {
                     buf.readBytes(fileTitle); // делаем запись байтов из буффера в байтовый массив
                     String fileName = new String(fileTitle, "UTF-8"); //собираем строчку с именем файла
                     System.out.println("Downloading file: " + fileName);  // выводим имя файла // для проверки выведена печать
-//                outputStream = new BufferedOutputStream(new FileOutputStream(path + "/" + new String(fileTitle))); // открываем стрим буфер на запись входящего стрима байтов  для записи байтов в файл
-                    Date date = new Date();
                     fileName = "Copy_" + fileName; // добавляем к файлу приписку что это копия оригинального файла который лежит у клиента (чтобы проверять было проще и не запутатся в файлах)
                     System.out.println("File name after downloading: " + fileName);
                     Path filePath = Paths.get(path, fileName);
@@ -68,8 +66,6 @@ public class WorkWithClientFiles {
                     currentState = State.DOWNLOAD_FILE;
                 }
             }
-
-
 
             if (currentState == State.DOWNLOAD_FILE) {
                 while (buf.readableBytes() > 0) { // пока есть в буфере файлы которые мы ещё не прочитали

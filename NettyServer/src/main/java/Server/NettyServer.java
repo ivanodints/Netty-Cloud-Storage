@@ -16,7 +16,6 @@ public class NettyServer {
     private final static String host = "localhost";
 
 
-
     public static void main(String[] args) throws Exception {
 
         new NettyServer().startServer();
@@ -30,7 +29,6 @@ public class NettyServer {
     public static String getHost() {
         return host;
     }
-
 
     public void startServer() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();  // поток на чтение

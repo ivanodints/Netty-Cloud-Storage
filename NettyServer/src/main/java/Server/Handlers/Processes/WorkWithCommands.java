@@ -1,11 +1,11 @@
 package Server.Handlers.Processes;
 
-import Server.ServerSendMsg;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class WorkWithCommands {
 
@@ -29,11 +29,28 @@ public class WorkWithCommands {
 
     }
 
-    public void run(String host, int port) {  //запускаем работу с коммандами передавая сетевые параметры
+    public void sendMsgToClient(ChannelHandlerContext ctx) {  //запускаем работу с коммандами передавая сетевые параметры
+
+        final char signalChar = '*';
 
         if (currentState == State.WORK) { //проверка статуса
-            ServerSendMsg.send(host,port,path);
+
+            File dir = new File(path);
+            File [] file  = dir.listFiles();
+            String files = "" + signalChar;
+
+            for (int i = 0; i<file.length; i++) {
+                String fileName = file[i].getName();
+                files = files + fileName + '\n';
+            }
+            System.out.println(files);
+            byte[] bytes = files.getBytes(StandardCharsets.UTF_8);
+            ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer(bytes.length);
+            byteBuf.writeBytes(bytes);
+            ctx.writeAndFlush(byteBuf);
+            byteBuf.release();
         }
         currentState = State.AWAIT;
     }
+
 }
