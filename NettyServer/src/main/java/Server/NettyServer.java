@@ -11,7 +11,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class NettyServer {
 
-    private final static int port = 9003;
+    private final static int port = 9010;
     public static final String serverStorage_Path = "StorageServer";
     private final static String host = "localhost";
 
